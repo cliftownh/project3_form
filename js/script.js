@@ -7,6 +7,15 @@ let color = document.getElementById('color');
 // Hide "other" other role
 other.style.display = 'none';
 
+let valid = {
+  name: {isValid: false},
+  email: {isValid: false},
+  cardNum: {isValid: false},
+  zipNum: {isValid: false},
+  cvvNum: {isValid: false},
+  activity: {isValid: false}
+}
+
 // Unless "Other" is selected
 title.addEventListener('change', function (event) {
   if (event.target.value === 'other') {
@@ -42,14 +51,6 @@ design.addEventListener('change', function (event) {
 });
 
 let checks = document.querySelector('.activities');
-// let main = document.querySelector('input[name="all"]');
-// let frame = document.querySelector('input[name="js-frameworks"]');
-// let libs = document.querySelector('input[name="js-libs"]');
-// let express = document.querySelector('input[name="express"]');
-// let nodes = document.querySelector('input[name="node"]');
-// let build = document.querySelector('input[name="build-tools"]');
-// let npm = document.querySelector('input[name="npm"]');
-
 let act = document.querySelectorAll('input[type="checkbox"]');
 let total = 0;
 
@@ -178,19 +179,7 @@ basic.insertBefore(errJob, other.nextElementSibling);
 cardInfo[0].insertBefore(errCC, ccNum.nextElementSibling);
 cardInfo[1].insertBefore(errZip, zip.nextElementSibling);
 cardInfo[2].insertBefore(errCVV, cvv.nextElementSibling);
-// cardInfo.appendChild(errCC);
-// cardInfo.appendChild(errZip);
-// cardInfo.appendChild(errCVV);
 checks.appendChild(errAct);
-// let alert = document.createElement('div');
-//
-// alert.className = 'alert';
-// alert.style.display = 'none';
-
-// let alert = document.createElement('div');
-// alert.className = 'alert';
-// alert.innerHTML = `<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>`;
-
 
 function validName(name) {
   return /[A-Z]/i.test(name);
@@ -205,12 +194,20 @@ function validCard(cc) {
 }
 
 function validZip(zip) {
-  return /^\d{5}$/;
+  return /^\d{5}$/.test(zip);
 }
 
 function validCVV(cvv) {
-  return /^\d{3}$/;
+  return /^\d{3}$/.test(cvv);
 }
+
+checks.addEventListener('change', (event) => {
+  if (event.target.tagName == 'INPUT') {
+    return valid.activity.isValid = true;
+  } else {
+    return valid.activity.isValid = false;
+  }
+});
 
 function toggleAlert(show, element) {
   // show element when show is true, hide when false
@@ -237,8 +234,6 @@ ccNum.addEventListener('focusout', createListener(validCard));
 zip.addEventListener('focusout', createListener(validZip));
 cvv.addEventListener('focusout', createListener(validCVV));
 // theForm.addEventListener('submit', )
-
-
 
 
 // End of code
