@@ -291,12 +291,20 @@ ccNum.addEventListener('focusout', createListener(validCard));
 zip.addEventListener('focusout', createListener(validZip));
 cvv.addEventListener('focusout', createListener(validCVV));
 theForm.addEventListener('submit', function (event) {
-  for (const prop in valid) {
-    if (valid.prop === false) {
+  // event.preventDefault();
+  let validate = [];
+  console.log('test')
+  for (var prop in valid) {
+    if (valid[prop].isValid === false) {
       errAct.style.display = '';
-      event.preventDefault();
-    } else {
+      validate.push(false);
+    } else if (valid[prop].isValid) {
+      validate.push(true);
       errAct.style.display = 'none';
     }
+  }
+  if (validate.indexOf(false)!==-1) {
+    event.preventDefault();
+    console.log(validate)
   }
 });
