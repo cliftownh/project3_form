@@ -3,17 +3,22 @@ let other = document.getElementById('other-title');
 let title = document.getElementById('title');
 let design = document.getElementById('design');
 let color = document.getElementById('color');
+let colorDiv = document.getElementById('colors-js-puns');
+let theme = design.options[0];
+theme.disabled = true;
 
 // Hide "other" other role
 other.style.display = 'none';
 
+// Set default validation for all inputs
 let valid = {
   name: {isValid: false},
   email: {isValid: false},
-  cardNum: {isValid: false},
-  zipNum: {isValid: false},
-  cvvNum: {isValid: false},
-  activity: {isValid: false}
+  other: {isValid: true},
+  card: {isValid: false},
+  zip: {isValid: false},
+  cvv: {isValid: false},
+  acts: {isValid: false}
 }
 
 // Unless "Other" is selected
@@ -21,16 +26,22 @@ title.addEventListener('change', function (event) {
   if (event.target.value === 'other') {
     other.style.display = '';
     other.focus();
-    other.addEventListener('focusout', createListener(validName));
+    other.addEventListener('focusout', createListener(validJob));
   } else {
+    valid.other.isValid = true;
     other.style.display = 'none';
     errJob.style.display = 'none';
     other.value = '';
   }
 });
 
+if (design.value === 'Select Theme') {
+  colorDiv.style.display = 'none';
+}
+
 design.addEventListener('change', function (event) {
   if (event.target.value === 'js puns') {
+    colorDiv.style.display = '';
     for (let i = 3; i < 6; i++) {
       color.options[i].style.display = 'none';
     }
@@ -40,6 +51,7 @@ design.addEventListener('change', function (event) {
     color.selectedIndex = '0';
   }
   if (event.target.value === 'heart js') {
+    colorDiv.style.display = '';
     for (let i = 0; i < 3; i++) {
       color.options[i].style.display = 'none';
     }
@@ -182,30 +194,75 @@ cardInfo[2].insertBefore(errCVV, cvv.nextElementSibling);
 checks.appendChild(errAct);
 
 function validName(name) {
-  return /[A-Z]/i.test(name);
+  if (/[A-Z]/i.test(name)) {
+    valid.name.isValid = true;
+    return true;
+  } else {
+    valid.name.isValid = false;
+    return false;
+  }
+}
+
+function validJob(other) {
+  if (/[A-Z]/i.test(other)) {
+    valid.other.isValid = true;
+    return true;
+  } else {
+    valid.other.isValid = false;
+    return false;
+  }
 }
 
 function validEmail(email) {
-  return /^[^@]+@[^@.]+\.[a-z]+$/i.test(email);
+  if (/^[^@]+@[^@.]+\.[a-z]+$/i.test(email)) {
+    valid.email.isValid = true;
+    return true;
+  } else {
+    valid.email.isValid = false;
+    return false;
+  }
 }
 
 function validCard(cc) {
-  return /^\d{13,16}$/.test(cc);
+  if (/^\d{13,16}$/.test(cc)) {
+    valid.card.isValid = true;
+    return true;
+  } else {
+    valid.card.isValid = false;
+    return false;
+  }
 }
 
 function validZip(zip) {
-  return /^\d{5}$/.test(zip);
+  if (/^\d{5}$/.test(zip)) {
+    valid.zip.isValid = true;
+    return true;
+  } else {
+    valid.zip.isValid = false;
+    return false;
+  }
 }
 
 function validCVV(cvv) {
-  return /^\d{3}$/.test(cvv);
+  if (/^\d{3}$/.test(cvv)) {
+    valid.cvv.isValid = true;
+    return true;
+  } else {
+    valid.cvv.isValid = false;
+    return false;
+  }
 }
 
+// If no activities are selected, the input is not valid
 checks.addEventListener('change', (event) => {
   if (event.target.tagName == 'INPUT') {
-    return valid.activity.isValid = true;
-  } else {
-    return valid.activity.isValid = false;
+    for (let i = 0; i < act.length; i++) {
+      if (act[i].checked) {
+        return valid.acts.isValid = true;
+      } else {
+        return valid.acts.isValid = false;
+      }
+    }
   }
 });
 
@@ -233,7 +290,13 @@ email.addEventListener('focusout', createListener(validEmail));
 ccNum.addEventListener('focusout', createListener(validCard));
 zip.addEventListener('focusout', createListener(validZip));
 cvv.addEventListener('focusout', createListener(validCVV));
-// theForm.addEventListener('submit', )
-
-
-// End of code
+theForm.addEventListener('submit', function (event) {
+  for (const prop in valid) {
+    if (valid.prop === false) {
+      errAct.style.display = '';
+      event.preventDefault();
+    } else {
+      errAct.style.display = 'none';
+    }
+  }
+});
