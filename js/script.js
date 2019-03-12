@@ -6,10 +6,8 @@ let color = document.getElementById('color');
 let colorDiv = document.getElementById('colors-js-puns');
 let theme = design.options[0];
 theme.disabled = true;
-
 // Hide "other" other role
 other.style.display = 'none';
-
 // Set default validation for all inputs
 let valid = {
   name: {isValid: false},
@@ -109,8 +107,11 @@ act[0].addEventListener('change', function (event) {
   price.innerHTML = `Total: $${total}`;
 
   if (total > 0) {
+    // update valid.acts isValid property based on total
+    valid.acts.isValid = true;
     price.style.display = '';
   } else {
+    valid.acts.isValid = false;
     price.style.display = 'none';
   }
 });
@@ -126,8 +127,10 @@ for (let i = 1; i < act.length; i++) {
     price.innerHTML = `Total: $${total}`;
 
     if (total > 0) {
+      valid.acts.isValid = true;
       price.style.display = '';
     } else {
+      valid.acts.isValid = false;
       price.style.display = 'none';
     }
   });
@@ -254,13 +257,14 @@ function validCVV(cvv) {
 }
 
 // If no activities are selected, the input is not valid
+// Currently you are returning the value of 'valid.acts.isValid' whenever an activity changes. The problem is the handler only makes it to the first checkbox because of your return stateents. The return statement causes the program to exit the function. The loop breaks on the first element because it is either checked or unchecked, trigerring either return statement. A more concise solution for the activity validation might be to use the running total var as a way of tracking whether or not an activity is checked.
 checks.addEventListener('change', (event) => {
   if (event.target.tagName == 'INPUT') {
     for (let i = 0; i < act.length; i++) {
       if (act[i].checked) {
-        return valid.acts.isValid = true;
+        // return valid.acts.isValid = true;
       } else {
-        return valid.acts.isValid = false;
+        // return valid.acts.isValid = false;
       }
     }
   }
@@ -291,9 +295,9 @@ ccNum.addEventListener('focusout', createListener(validCard));
 zip.addEventListener('focusout', createListener(validZip));
 cvv.addEventListener('focusout', createListener(validCVV));
 theForm.addEventListener('submit', function (event) {
-  // event.preventDefault();
+  // Initialize validate array that will hold an array of boolean values
   let validate = [];
-  console.log('test')
+  //checks isValid property for each key in Valid Object. A boolean value will be pushed to the validate array based on the value of isValid.
   for (var prop in valid) {
     if (valid[prop].isValid === false) {
       errAct.style.display = '';
@@ -303,6 +307,7 @@ theForm.addEventListener('submit', function (event) {
       errAct.style.display = 'none';
     }
   }
+  //Check to see if validate array contains a false value. If one exists, the form is not valid and form is prevented from being submitted.
   if (validate.indexOf(false)!==-1) {
     event.preventDefault();
     console.log(validate)
