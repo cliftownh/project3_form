@@ -5,9 +5,6 @@ let design = document.getElementById('design');
 let color = document.getElementById('color');
 let colorDiv = document.getElementById('colors-js-puns');
 let theme = design.options[0];
-theme.disabled = true;
-
-// Hide "other" other role
 other.style.display = 'none';
 
 // Set default validation for all inputs
@@ -21,7 +18,7 @@ let valid = {
   acts: {isValid: false}
 }
 
-// Unless "Other" is selected
+// Show other job role textbox if "other" is selected
 title.addEventListener('change', function (event) {
   if (event.target.value === 'other') {
     other.style.display = '';
@@ -35,11 +32,13 @@ title.addEventListener('change', function (event) {
   }
 });
 
+// Hide color selection until a design is chosen
 if (design.value === 'Select Theme') {
   colorDiv.style.display = 'none';
 }
-
+// Only show the relevant colors based on the chosen design
 design.addEventListener('change', function (event) {
+  theme.disabled = true;
   if (event.target.value === 'js puns') {
     colorDiv.style.display = '';
     for (let i = 3; i < 6; i++) {
@@ -66,8 +65,7 @@ let checks = document.querySelector('.activities');
 let act = document.querySelectorAll('input[type="checkbox"]');
 let total = 0;
 
-// Disable activities if they overlap
-// already selected activities
+// Disable activities if they overlap already selected activities
 checks.addEventListener('change', function (event) {
   if (act[1].checked) {
     act[3].disabled = true;
@@ -99,6 +97,7 @@ let price = document.createElement('label');
 price.style.display = 'none';
 checks.appendChild(price);
 
+// Main Conference - $200
 act[0].addEventListener('change', function (event) {
   if (act[0].checked) {
     total += 200;
@@ -109,12 +108,16 @@ act[0].addEventListener('change', function (event) {
   price.innerHTML = `Total: $${total}`;
 
   if (total > 0) {
+    valid.acts.isValid = true;
     price.style.display = '';
+    errAct.style.display = 'none';
   } else {
+    valid.acts.isValid = false;
     price.style.display = 'none';
   }
 });
 
+// All other activities - $100
 for (let i = 1; i < act.length; i++) {
   act[i].addEventListener('change', function (event) {
     if (act[i].checked) {
@@ -126,8 +129,11 @@ for (let i = 1; i < act.length; i++) {
     price.innerHTML = `Total: $${total}`;
 
     if (total > 0) {
+      valid.acts.isValid = true;
       price.style.display = '';
+      errAct.style.display = 'none';
     } else {
+      valid.acts.isValid = false;
       price.style.display = 'none';
     }
   });
@@ -159,7 +165,7 @@ payment.addEventListener('change', function (event) {
   }
 });
 
-// Regular expressions for validation
+// Alert constructor for error messages
 class Alert {
   constructor(message) {
     let alert = document.createElement('div');
@@ -193,6 +199,7 @@ cardInfo[1].insertBefore(errZip, zip.nextElementSibling);
 cardInfo[2].insertBefore(errCVV, cvv.nextElementSibling);
 checks.appendChild(errAct);
 
+// Functions for testing regular expressions on inputs
 function validName(name) {
   if (/[A-Z]/i.test(name)) {
     valid.name.isValid = true;
@@ -228,6 +235,12 @@ function validCard(cc) {
     valid.card.isValid = true;
     return true;
   } else {
+    if (cc.length < 13 && cc.length > 0) {
+      errCC.innerText = 'Please enter a number that is between 13 and 16 digits long.';
+    }
+    if (cc == '') {
+      errCC.innerText = 'Must enter a valid credit card number (13-16 digits).';
+    }
     valid.card.isValid = false;
     return false;
   }
@@ -252,19 +265,6 @@ function validCVV(cvv) {
     return false;
   }
 }
-
-// If no activities are selected, the input is not valid
-checks.addEventListener('change', (event) => {
-  if (event.target.tagName == 'INPUT') {
-    for (let i = 0; i < act.length; i++) {
-      if (act[i].checked) {
-        return valid.acts.isValid = true;
-      } else {
-        return valid.acts.isValid = false;
-      }
-    }
-  }
-});
 
 function toggleAlert(show, element) {
   // show element when show is true, hide when false
@@ -291,12 +291,33 @@ ccNum.addEventListener('focusout', createListener(validCard));
 zip.addEventListener('focusout', createListener(validZip));
 cvv.addEventListener('focusout', createListener(validCVV));
 theForm.addEventListener('submit', function (event) {
-  for (const prop in valid) {
-    if (valid.prop === false) {
-      errAct.style.display = '';
-      event.preventDefault();
-    } else {
+  let validate = [];
+
+  if (email.value === '') {
+    errMail.style.display = '';
+  }
+  if (ccNum.value === '') {
+    errCC.style.display = '';
+  }
+  if (zip.value === '') {
+    errZip.style.display = '';
+  }
+  if (cvv.value === '') {
+    errCVV.style.display = '';
+  }
+  // Keeps track of valid inputs
+  for (var prop in valid) {
+    if (valid[prop].isValid) {
       errAct.style.display = 'none';
+      validate.push(true);
+    } else {
+      validate.push(false);
+      errAct.style.display = '';
     }
+  }
+  // If there are any invalid inputs, the form will not submit
+  if (validate.indexOf(false)!==-1) {
+    event.preventDefault();
+    console.log(validate)
   }
 });
